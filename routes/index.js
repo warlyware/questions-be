@@ -19,8 +19,16 @@ var Question = mongoose.model("Question", {
   body: { type: String, required: true, unique: true },
   email: { type: String, required: true },
   gravatarUrl: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  answers: [{
+    email: String,
+    body: String,
+    slug: String,
+    gravatarUrl: String,
+    createdAt: {type: Date, default: Date.now }
+  }]
 });
+
 
 // temp500Qs = Array.apply(null, Array(500)).map(function(n, i) { return { body: "Q" + i, email: 'test@test.com', slug: "q-" + i, gravatarUrl: "test" } });
 // Question.create(temp500Qs, function(err) {
@@ -53,6 +61,9 @@ router.post('/test', function(req, res, next) {
   res.json(response);
 });
 
+
+
+
 router.post("/questions", function(req, res) {
   var question = new Question(req.body);
 
@@ -70,7 +81,6 @@ router.post("/questions", function(req, res) {
 });
 
 router.get("/questions", function(req, res) {
-  console.log('qwer');
   Question.find({}).sort({ createdAt: 'desc' }).limit(3).exec(function(err, questions) {
     if (err) {
       console.log(err);
@@ -118,6 +128,29 @@ router.delete("/questions/:questionCode", function(req, res) {
       res.status(404);
     }
     res.json({message: 'question deleted'});
+  });
+});
+
+router.post("/questions/:slug/answers", function(req, res) {
+  Question.findOne({ slug: req.params.slug }, function(err, question) {
+    console.log(err, answer);
+    if (err) {
+      console.log(err);
+      res.status(400).json({ error: "Could not read answer data" });
+    }
+    if (!question) {
+      res.status(404);
+    }
+    var answer = req.body;
+    answer.gravatarUrl = "http://www.gravatar.com/avatar/" + MD5(req.body.email);
+    question.answers.push(answer);
+    question.save(function(err, savedQuestion) {
+      if (err) {
+        console.log(err);
+        res.status(400).json({ error: "Could not read answer data" });
+      }
+      res.json(savedQuestion);
+    });
   });
 });
 

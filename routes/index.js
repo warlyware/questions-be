@@ -7,6 +7,7 @@ var cors = require('cors')
 
 mongoose.connect(process.env.MONGOLAB_URI);
 
+
 // var User = mongoose.model("users", { name: String });
 // var user1 = new User({name: 'from Mongoos'});
 // user1.save();
@@ -19,6 +20,7 @@ var Question = mongoose.model('Question', {
   slug: { type: String, required: true, unique: true },
   body: { type: String, required: true, unique: true },
   email: { type: String, required: true },
+  username: { type: String, required: true },
   gravatarUrl: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
   answers: [{
@@ -105,6 +107,7 @@ router.get("/questions/:questionCode", function(req, res) {
 });
 
 router.patch("/questions/:questionCode", function(req, res) {
+  console.log(req.body);
   Question.findOneAndUpdate({ slug: req.params.questionCode }, req.body, { new: true }, function(err, updatedQuestion) {
     console.log(err, updatedQuestion);
     if (err) {

@@ -1,8 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
-var MD5 = require("MD5");
-var slug = require("slug");
+var MD5 = require('MD5');
+var slug = require('slug');
+var cors = require('cors')
 
 mongoose.connect(process.env.MONGOLAB_URI);
 
@@ -14,7 +15,7 @@ mongoose.connect(process.env.MONGOLAB_URI);
 //   console.log(data);
 // });
 
-var Question = mongoose.model("Question", {
+var Question = mongoose.model('Question', {
   slug: { type: String, required: true, unique: true },
   body: { type: String, required: true, unique: true },
   email: { type: String, required: true },
@@ -117,7 +118,7 @@ router.patch("/questions/:questionCode", function(req, res) {
   });
 });
 
-router.delete("/questions/:questionCode", function(req, res) {
+router.delete("/questions/:questionCode", cors(), function(req, res) {
   Question.findOneAndRemove({ slug: req.params.questionCode }, function(err, updatedQuestion) {
     console.log(err, updatedQuestion);
     if (err) {
